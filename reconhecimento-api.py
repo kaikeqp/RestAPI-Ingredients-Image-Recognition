@@ -3,7 +3,6 @@ import tensorflow as tf
 import os
 from flask import Flask, request
 from tensorflow.keras.models import load_model
-import matplotlib.pyplot as plt
 from werkzeug.utils import secure_filename
 
 # Consts
@@ -22,6 +21,10 @@ app = Flask(__name__)
 model = load_model(os.path.join(BASE_DIR, 'model.hdf5'))
 
 # Routes
+@app.route('/', methods=['GET'])
+def home():
+    return "<h1>API funcionando<h1>"
+
 @app.route('/predictUrl', methods=['POST'])
 def predict_url():
     try:
