@@ -4,6 +4,7 @@ import os
 from flask import Flask, request
 from tensorflow.keras.models import load_model
 from werkzeug.utils import secure_filename
+import base64
 
 # Consts
 CLASS_NAMES = [
@@ -13,6 +14,7 @@ IMAGE_WIDTH = 160
 IMAGE_HEIGHT = 160
 IMAGE_SIZE = (IMAGE_WIDTH, IMAGE_HEIGHT)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 # Create Flask App
 app = Flask(__name__)
@@ -44,23 +46,25 @@ def predict_url():
 @app.route('/predict', methods=['POST'])
 def predict_file():
     try:
-        if 'file' not in request.files:
-            return "Please try again. The Image doesn't exist"
-
-        # Get the file from post request
-        file = request.files['file']
-        filename = file.filename
+        file = request.form.get('file')
+        filename = "image.png"
+        # Convert base64 to Image
+        
+        imgdata = base64.b64decode(file)
+        with open(filename, "wb") as fh:
+            fh.write(imgdata)
+               
         file_path = os.path.join(BASE_DIR, secure_filename(filename))
-        file.save(file_path)
 
         prediction_result = _predict(file_path)
+        
         # Remove the file after prediction
         os.remove(file_path)
     except:
         prediction_result = {
             "ingredient_predicted": "undefined",
             "probability": 0,
-            "message": "Ocorreu um erro tentar predizer a imagem recebido."
+            "message": "Ocorreu um erro tentar predizer a imagem recebida."
         }
     finally:
         return prediction_result, 200
@@ -91,5 +95,5 @@ def _predict_url(image_origin):
 
 # Run
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5500))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

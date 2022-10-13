@@ -1,4 +1,4 @@
 {
     "python.formatting.provider": "yapf",
-    "debug.internalConsoleOptions": "neverOpen"
+    "debug.internalConsoleOptions": "neverOpen",
 }
